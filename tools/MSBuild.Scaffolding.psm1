@@ -58,7 +58,7 @@ function ProcessProject($project, $projectToConfigure)
 	}
 	else 
 	{	
-		if (!($projectToConfigure -eq $null -or $projectToConfigure -eq $project.Name))
+		if (!($projectToConfigure -eq "" -or $projectToConfigure -eq $project.Name))
 		{
 			return
 		}
