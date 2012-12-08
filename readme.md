@@ -9,10 +9,10 @@ Powershell package that adds basic MSBuild script and required infrastructure to
 ### How to install it and configure solution?
 ![Solution Configuration using Package Manager Console](https://raw.github.com/mayvazyan/MSBuild.Scaffolding/master/Docs/PackageManagerConsole.png "Solution Configuration")
 
-### How it looks like after installation
+### How solution looks like after `Enable-Versioning`
 ![Solution Explorer with MSBuild.Scaffolding installed](https://raw.github.com/mayvazyan/MSBuild.Scaffolding/master/Docs/SolutionExplorer.png "Solution Explorer")
 
-### How to run build script?
+### How to run Build Script?
 `msbuild {BUILD_SCRIPT_NAME}.proj /p:BuildNumber=1 /p:RevisionNumber=22 /t:publish`
 
 ### Enable-Versioning explained
