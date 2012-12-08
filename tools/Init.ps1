@@ -49,18 +49,21 @@ function ImportPowershellModule() {
 	
 	$thisModule = Test-ModuleManifest (Join-Path $toolsPath $thisModuleManifest)	
 	$name = $thisModule.Name
+	
 	$importedModule = Get-Module | ?{ $_.Name -eq $name }
 	if ($importedModule)
 	{
-		if ($importedModule.Version -eq $thisModule.Version) 
+		if ($false -and $importedModule.Version -eq $thisModule.Version) 
 		{
 			return			
 		}
 		else 
 		{
+			Write-Host "Remove module"
 			Remove-Module $name			
 		}    
 	}
+	Write-Host "Import Module"
 	Import-Module -Force -Global $thisModule
 }
 

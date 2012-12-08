@@ -14,21 +14,8 @@ $knownExceptions = @(
     Specifies the project that should be configured. If omitted, all the projects will be updated.
 	Maybe the default project selected in package manager console should be used instead?
 #>
-function HasAssemblyVersion($project)
-{
-	foreach ($prop in $project.Properties) {
-		if ($prop.Name -eq "AssemblyVersion") {
-			return $true
-		}			
-	}
-	return $false
-}
 function IsConfigured($project)
-{
-	if (!(HasAssemblyVersion $project)) {
-		# it's ok we don't need to do anything with that project
-		return $true
-	}
+{	
 	$fileName = "SharedAssemblyInfo.cs"
 	
 	foreach($file in $project.ProjectItems) {				
@@ -38,35 +25,68 @@ function IsConfigured($project)
 	}
 	return $false;
 }
+function ConfigureProject($project)
+{
+	if (IsConfigured $project) {
+		return
+	}		
+	Write-Host Configure $project.Name
+
+	# Add SharedAssemblyInfo.cs
+	$project.ProjectItems.AddFromFile($sharedAssemblyInfoPath) | Out-Null		
+
+	# Update Assembly Info
+	$projectDirectoryName = [System.IO.Path]::GetDirectoryName($project.FullName)
+	$assemblyInfoPath = Join-Path $projectDirectoryName "Properties\AssemblyInfo.cs"		
+	(Get-Content $assemblyInfoPath) | Foreach-Object {
+			$_ -replace '\[assembly\: AssemblyVersion\(', '//[assembly: AssemblyVersion(' `
+				-replace '\[assembly\: AssemblyFileVersion\(','//[assembly: AssemblyFileVersion('
+			} | Set-Content $assemblyInfoPath
+}
+
+function ProcessProject($project, $projectToConfigure)
+{
+	$kind = $project.Kind.ToString() # http://msdn.microsoft.com/en-us/library/hb23x61k(v=vs.80).aspx
+	if ($kind -eq "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}") # Solution Folder
+	{
+		foreach ($p in $project.ProjectItems) 
+		{
+			if ($p.SubProject)
+			{
+				ProcessProject $p.SubProject $projectToConfigure
+			}
+		}
+	}
+	else 
+	{	
+		if (!($projectToConfigure -eq $null -or $projectToConfigure -eq $project.Name))
+		{
+			return
+		}
+		if ($kind -eq "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") # Visual C#
+		{
+			ConfigureProject $project
+		}
+		else
+		{ 
+			Write-Host Project Ignored $project.Name - project type isn''t supported
+		}
+	}		
+}
 
 function Enable-Versioning
 {
 	[CmdletBinding()] 
     param (
-        [string] $ProjectName
+        [string] $projectToConfigure
     )
 	$fileName = "SharedAssemblyInfo.cs"
 	$solution = Get-Interface $dte.Solution ([EnvDTE80.Solution2])
 	$solutionDirectoryName = [System.IO.Path]::GetDirectoryName($solution.FileName)
 	$sharedAssemblyInfoPath = (Join-Path $solutionDirectoryName "Build\SharedAssemblyInfo.cs")
 	
-	foreach($project in $solution.Projects) {
-		if (IsConfigured $project) {
-			continue
-		}
-		
-		Write-Host 'Configure ' . $project.Name
-
-		# Add SharedAssemblyInfo.cs
-		$project.ProjectItems.AddFromFile($sharedAssemblyInfoPath) | Out-Null		
-
-		# Update Assembly Info
-		$projectDirectoryName = [System.IO.Path]::GetDirectoryName($project.FullName)
-		$assemblyInfoPath = Join-Path $projectDirectoryName "Properties\AssemblyInfo.cs"		
-		(Get-Content $assemblyInfoPath) | Foreach-Object {
-				$_ -replace '\[assembly\: AssemblyVersion\(', '//[assembly: AssemblyVersion(' `
-				   -replace '\[assembly\: AssemblyFileVersion\(','//[assembly: AssemblyFileVersion('
-				} | Set-Content $assemblyInfoPath
+	foreach($project in $solution.Projects) {		
+		ProcessProject $project $projectToConfigure
 	}	
 }
 

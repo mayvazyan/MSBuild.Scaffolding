@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>MSBuild.Scaffolding</id>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
     <authors>Michael Ayvazyan</authors>
     <owners>Michael Ayvazyan</owners>
     <projectUrl>http://ayvazyan.net/msbuild-scaffolding/</projectUrl>
