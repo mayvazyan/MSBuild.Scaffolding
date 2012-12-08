@@ -5,14 +5,13 @@ $knownExceptions = @(
 
 <#
 .SYNOPSIS
-    Configures project to use SharedAssemblyInfo.cs.
+	Configures project to use SharedAssemblyInfo.cs.
 
 .DESCRIPTION
 	Adds reference to .\Build\SharedAssemblyInfo.cs and removes version related attributes from the AssemblyInfo.cs.    
 
 .PARAMETER ProjectName
-    Specifies the project that should be configured. If omitted, all the projects will be updated.
-	Maybe the default project selected in package manager console should be used instead?
+    Specifies the project that should be configured. If omitted, all the supported projects will be updated.
 #>
 function IsConfigured($project)
 {	
@@ -78,7 +77,7 @@ function Enable-Versioning
 {
 	[CmdletBinding()] 
     param (
-        [string] $projectToConfigure
+        [string] $ProjectName
     )
 	$fileName = "SharedAssemblyInfo.cs"
 	$solution = Get-Interface $dte.Solution ([EnvDTE80.Solution2])
@@ -86,7 +85,7 @@ function Enable-Versioning
 	$sharedAssemblyInfoPath = (Join-Path $solutionDirectoryName "Build\SharedAssemblyInfo.cs")
 	
 	foreach($project in $solution.Projects) {		
-		ProcessProject $project $projectToConfigure
+		ProcessProject $project $ProjectName
 	}	
 }
 
