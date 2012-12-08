@@ -30,17 +30,22 @@ function ConfigureProject($project)
 		return
 	}		
 	Write-Host Configure $project.Name
-
+	
 	# Add SharedAssemblyInfo.cs
 	$project.ProjectItems.AddFromFile($sharedAssemblyInfoPath) | Out-Null		
 
 	# Update Assembly Info
 	$projectDirectoryName = [System.IO.Path]::GetDirectoryName($project.FullName)
-	$assemblyInfoPath = Join-Path $projectDirectoryName "Properties\AssemblyInfo.cs"		
+	$assemblyInfoPath = Join-Path $projectDirectoryName "Properties\AssemblyInfo.cs"
+
+	if ($global:IsTfsInstalled) { 
+	    TfsCheckedOut $assemblyInfoPath
+	}
+
 	(Get-Content $assemblyInfoPath) | Foreach-Object {
 			$_ -replace '\[assembly\: AssemblyVersion\(', '//[assembly: AssemblyVersion(' `
 				-replace '\[assembly\: AssemblyFileVersion\(','//[assembly: AssemblyFileVersion('
-			} | Set-Content $assemblyInfoPath
+			} | Out-File -Encoding UTF8 $assemblyInfoPath
 }
 
 function ProcessProject($project, $projectToConfigure)
@@ -73,6 +78,23 @@ function ProcessProject($project, $projectToConfigure)
 	}		
 }
 
+# Thanks to Jason Stangroome http://blog.codeassassin.com/2010/08/11/automatic-tfs-check-out-for-powershell-ise/
+function TfsCheckedOut (
+    [string]
+    $Path,
+    [switch]
+    $Force
+) {
+    if (-not $Force -and -not (Get-Item -Path $Path).IsReadOnly) { return }
+    $WorkstationType = [Microsoft.TeamFoundation.VersionControl.Client.Workstation]
+    if (-not $WorkstationType::Current.IsMapped($Path)) { return }
+    $WorkspaceInfo = $WorkstationType::Current.GetLocalWorkspaceInfo($Path)
+    $Collection = [Microsoft.TeamFoundation.Client.TfsTeamProjectCollectionFactory]::GetTeamProjectCollection($WorkspaceInfo.ServerUri)
+    $Collection.EnsureAuthenticated()
+    $Workspace = $WorkspaceInfo.GetWorkspace($Collection)
+    $Workspace.PendEdit($Path) | Out-Null
+}
+
 function Enable-Versioning
 {
 	[CmdletBinding()] 
@@ -87,6 +109,18 @@ function Enable-Versioning
 	foreach($project in $solution.Projects) {		
 		ProcessProject $project $ProjectName
 	}	
+}
+
+$global:IsTfsInstalled = $false
+try {
+    [Reflection.Assembly]::Load('Microsoft.TeamFoundation.VersionControl.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a') | Out-Null
+    $global:IsTfsInstalled = $true
+} catch {
+    try {
+        [Reflection.Assembly]::Load('Microsoft.TeamFoundation.VersionControl.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a') | Out-Null
+        $global:IsTfsInstalled = $true
+    } catch {        
+    }
 }
 
 Export-ModuleMember @( 'Enable-Versioning')
