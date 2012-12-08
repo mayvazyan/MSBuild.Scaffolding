@@ -6,6 +6,9 @@ Powershell package that adds basic MSBuild script and required infrastructure to
 * Updates `SharedAssemblyInfo.cs` by the prober build and revision number during each build (by using MSBuildCommunity tasks)
 * `Enable-Versioning` cmdlet allows to easily configure solution projects to use SharedAssemblyInfo.cs.
 
+### How to run build script?
+`msbuild {BUILD_SCRIPT_NAME}.proj /p:BuildNumber=1 /p:RevisionNumber=22 /t:publish`
+
 ### Enable-Versioning explained
 * In Visual Studio please open Package Manager Console
 * Type `Enable-Versioning` and hit Enter - all the projects in the solution will be configured to use version from the SharedAssemblyInfo.cs

@@ -13,7 +13,7 @@
   <PropertyGroup>
     <OutDir Condition="'$(OutDir)' == ''">.\BuildArtifacts\</OutDir>
     <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
-    <SourceGetVersion Condition="'$(SourceGetVersion)' == ''">0</SourceGetVersion>
+    <RevisionNumber Condition="'$(RevisionNumber)' == ''">0</RevisionNumber>
     <BuildInParallel Condition="'$(BuildInParallel)' == ''">true</BuildInParallel>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <DeployDirectory Condition="'$(DeployDirectory)' == ''">$(OutDir)_Deploy\</DeployDirectory>
@@ -24,7 +24,7 @@
     <Major>1</Major>
     <Minor>0</Minor>
     <Build>$(BuildNumber)</Build>
-    <Revision>$(SourceGetVersion)</Revision>
+    <Revision>$(RevisionNumber)</Revision>
   </PropertyGroup>
 
   <ItemGroup>

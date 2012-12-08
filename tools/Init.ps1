@@ -59,11 +59,9 @@ function ImportPowershellModule() {
 		}
 		else 
 		{
-			Write-Host "Remove module"
 			Remove-Module $name			
 		}    
 	}
-	Write-Host "Import Module"
 	Import-Module -Force -Global $thisModule
 }
 
