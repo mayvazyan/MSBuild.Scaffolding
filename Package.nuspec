@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>MSBuild.Scaffolding</id>
+    <version>0.1.2</version>
+    <authors>Michael Ayvazyan</authors>
+    <owners>Michael Ayvazyan</owners>
+    <projectUrl>http://ayvazyan.net/msbuild-scaffolding/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Adds basic MSBuild script and required infrastructure to your solution.</description>
+    <releaseNotes>Alpha version.</releaseNotes>
+    <copyright>Copyright 2012</copyright>
+    <tags>MSBuild, Scaffolding, Continous Integration, Continous Build, Automated Build</tags>
+  </metadata>
+</package>

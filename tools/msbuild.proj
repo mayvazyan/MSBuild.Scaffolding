@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.5"
+         DefaultTargets="Build">
+
+  <!-- Import MSBuild Community Tasks -->
+  <PropertyGroup>
+    <MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\Build</MSBuildCommunityTasksPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildProjectDirectory)\Build\MSBuild.Community.Tasks.targets" />
+
+  <!-- Define some variables -->
+  <PropertyGroup>
+    <OutDir Condition="'$(OutDir)' == ''">.\BuildArtifacts\</OutDir>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
+    <SourceGetVersion Condition="'$(SourceGetVersion)' == ''">0</SourceGetVersion>
+    <BuildInParallel Condition="'$(BuildInParallel)' == ''">true</BuildInParallel>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <DeployDirectory Condition="'$(DeployDirectory)' == ''">$(OutDir)_Deploy\</DeployDirectory>
+  </PropertyGroup>
+
+  <!-- Define Production Version-->
+  <PropertyGroup>
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>$(BuildNumber)</Build>
+    <Revision>$(SourceGetVersion)</Revision>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BuildArtifacts Include="$(OutDir)" />
+    <SolutionFile Include=".\YOUR_SOLUTION_NAME.sln"/>
+  </ItemGroup>
+
+  <Target Name="Clean">
+    <RemoveDir Directories="@(BuildArtifacts)"/>
+  </Target>
+
+  <Target Name="UpdateAssemblyInfo">
+    <Attrib Files=".\Build\SharedAssemblyInfo.cs" ReadOnly="false"/>
+    <AssemblyInfo CodeLanguage="CS"
+      OutputFile=".\Build\SharedAssemblyInfo.cs"
+      AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
+      AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
+      Condition="$(Revision) != '0' "/>
+    <Message Text="Version: $(Major).$(Minor).$(Build).$(Revision)"/>
+  </Target>
+
+  <Target Name="Init" DependsOnTargets="Clean;UpdateAssemblyInfo">
+    <MakeDir Directories="@(BuildArtifacts)"/>
+    <MakeDir Directories="$(DeployDirectory)"/>
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="Init">
+    <MSBuild Projects="@(SolutionFile)"
+             BuildInParallel="$(BuildInParallel)"
+             Targets="Build"
+             Properties="OutDir=%(BuildArtifacts.FullPath);Configuration=$(Configuration);"/>
+  </Target>
+
+  <Target Name="Publish" DependsOnTargets="Build">
+    <!-- Some solution specific tasks here -->
+  </Target>
+
+</Project>
