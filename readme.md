@@ -6,6 +6,12 @@ Powershell package that adds basic MSBuild script and required infrastructure to
 * Updates `SharedAssemblyInfo.cs` by the prober build and revision number during each build (by using MSBuildCommunity tasks)
 * `Enable-Versioning` cmdlet allows to easily configure solution projects to use SharedAssemblyInfo.cs.
 
+### How to install it and configure solution?
+![Solution Configuration using Package Manager Console](https://raw.github.com/mayvazyan/MSBuild.Scaffolding/master/Docs/PackageManagerConsole.png "Solution Configuration")
+
+### How it looks like after installation
+![Solution Explorer with MSBuild.Scaffolding installed](https://raw.github.com/mayvazyan/MSBuild.Scaffolding/master/Docs/SolutionExplorer.png "Solution Explorer")
+
 ### How to run build script?
 `msbuild {BUILD_SCRIPT_NAME}.proj /p:BuildNumber=1 /p:RevisionNumber=22 /t:publish`
 
@@ -21,7 +27,7 @@ In order to use Enable-Versioning cmdlet package should be installed.
 
 ## Copyright
 
-Copyright © 2012 Michael Ayvazyan
+Copyright Â© 2012 Michael Ayvazyan
 
 ## License
 
