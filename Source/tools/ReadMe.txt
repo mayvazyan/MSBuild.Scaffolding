@@ -7,5 +7,5 @@ Default build script target set to Build. So in most cases on build server you'l
 ex. "msbuild [YourSolutionName].proj /t:Publish"
 
 3. Assembly version
-Build Number and Revision could be passed to build script using BuildNumber & SourceGetVersion arguments.
-ex. "msbuild [YourSolutionName].proj /t:Publish /p:BuildNumber=1 /p:SourceGetVersion=101"
+Build Number and Revision could be passed to build script using BuildNumber & RevisionNumber arguments.
+ex. "msbuild [YourSolutionName].proj /t:Publish /p:BuildNumber=1 /p:RevisionNumber=101"
